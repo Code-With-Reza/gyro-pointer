@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gyroscope Cube Visualization</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    #cube {
+      width: 100px;
+      height: 100px;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+      position: relative;
+    }
+
+    .face {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+    }
+
+    .face-front { transform: translateZ(50px); }
+    .face-back { transform: rotateY(180deg) translateZ(50px); }
+    .face-left { transform: rotateY(-90deg) translateZ(50px); }
+    .face-right { transform: rotateY(90deg) translateZ(50px); }
+    .face-top { transform: rotateX(90deg) translateZ(50px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+    #gyroscope-data {
+      margin-top: 20px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    #reset-btn {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #reset-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cube">
+  <div class="face face-front">Front</div>
+  <div class="face face-back">Back</div>
+  <div class="face face-left">Left</div>
+  <div class="face face-right">Right</div>
+  <div class="face face-top">Top</div>
+  <div class="face face-bottom">Bottom</div>
+</div>
+
+<div id="gyroscope-data">
+  Alpha: <span id="alpha">0</span>°<br>
+  Beta: <span id="beta">0</span>°<br>
+  Gamma: <span id="gamma">0</span>°
+</div>
+
+<button id="reset-btn">Set Current Position as Front</button>
+
+<script>
+  let offsetAlpha = 0, offsetBeta = 0, offsetGamma = 0;
+
+  // Add smoothing for less jitter
+  function smooth(value, target, factor = 0.1) {
+    return value + (target - value) * factor;
+  }
+
+  let smoothAlpha = 0, smoothBeta = 0, smoothGamma = 0;
+
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", (event) => {
+      // Adjust by offset to allow resetting
+      const alpha = event.alpha - offsetAlpha;
+      const beta = event.beta - offsetBeta;
+      const gamma = event.gamma - offsetGamma;
+
+      // Smooth the values
+      smoothAlpha = smooth(smoothAlpha, alpha);
+      smoothBeta = smooth(smoothBeta, beta);
+      smoothGamma = smooth(smoothGamma, gamma);
+
+      // Display the smoothed gyroscope data
+      document.getElementById("alpha").textContent = smoothAlpha.toFixed(2);
+      document.getElementById("beta").textContent = smoothBeta.toFixed(2);
+      document.getElementById("gamma").textContent = smoothGamma.toFixed(2);
+
+      // Apply rotation to the cube
+      document.getElementById("cube").style.transform =
+        `rotateX(${smoothBeta}deg) rotateY(${smoothGamma}deg) rotateZ(${smoothAlpha}deg)`;
+    });
+  } else {
+    alert("Your device does not support gyroscope!");
+  }
+
+  // Reset button to set the current orientation as the "front"
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    offsetAlpha = smoothAlpha;
+    offsetBeta = smoothBeta;
+    offsetGamma = smoothGamma;
+  });
+</script>
+
+</body>
+</html>
