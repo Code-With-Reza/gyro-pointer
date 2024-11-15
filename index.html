@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gyroscope Cube Visualization</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    #cube {
+      width: 100px;
+      height: 100px;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+      transition: transform 0.1s;
+      position: relative;
+    }
+
+    .face {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+    }
+
+    .face-front { transform: translateZ(50px); }
+    .face-back { transform: rotateY(180deg) translateZ(50px); }
+    .face-left { transform: rotateY(-90deg) translateZ(50px); }
+    .face-right { transform: rotateY(90deg) translateZ(50px); }
+    .face-top { transform: rotateX(90deg) translateZ(50px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(50px); }
+  </style>
+</head>
+<body>
+
+<div id="cube">
+  <div class="face face-front">Front</div>
+  <div class="face face-back">Back</div>
+  <div class="face face-left">Left</div>
+  <div class="face face-right">Right</div>
+  <div class="face face-top">Top</div>
+  <div class="face face-bottom">Bottom</div>
+</div>
+
+<script>
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", (event) => {
+      const { alpha, beta, gamma } = event;
+      
+      // Map orientation values to rotation on each axis
+      document.getElementById("cube").style.transform =
+        `rotateX(${beta}deg) rotateY(${gamma}deg) rotateZ(${alpha}deg)`;
+    });
+  } else {
+    alert("Your device does not support gyroscope!");
+  }
+</script>
+
+</body>
+</html>
